@@ -9,6 +9,7 @@ public class Tile : MonoBehaviour
     Image image;
     public Color checkColor;
     public Chess stay;
+    public bool canUpgrade;
     private void Start()
     {
         image = GetComponent<Image>();
