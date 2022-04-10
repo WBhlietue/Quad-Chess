@@ -92,6 +92,7 @@ MonoBehaviour:
   canUse: 0
   checkColor: {r: 0.29622638, g: 1, b: 0.571616, a: 1}
   stay: {fileID: 0}
+  canUpgrade: 0
 --- !u!61 &7199207859903843578
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -116,5 +117,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 1
   serializedVersion: 2
-  m_Size: {x: 75, y: 75}
+  m_Size: {x: 50, y: 50}
   m_EdgeRadius: 0

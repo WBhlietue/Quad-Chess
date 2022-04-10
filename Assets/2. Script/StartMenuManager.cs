@@ -5,16 +5,17 @@ using Photon.Pun;
 
 public class StartMenuManager : MonoBehaviourPunCallbacks
 {
+    private void Awake() {
+        Application.targetFrameRate = 60;
+    }
     public void Connect()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectUsingSettings();
-        Debug.Log("start to connect");
     }
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("complete");
         UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
     }
 }

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
+using Photon.Pun;
 public class Chess : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
+    public int chessNum;
     public ChessClass chessClass;
     public Team chessTeam;
     Vector3 zuruu;
@@ -29,12 +30,15 @@ public class Chess : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     Panel panel;
     public List<Tile> targetTiles = new List<Tile>();
     public Gmanager gmanager;
+    PhotonView pv;
     private void Start()
     {
+        pv = GetComponent<PhotonView>();
         panel = Panel.instance;
         transform.parent = Gmanager.instance.chessHome;
+        transform.localScale = Vector3.one;
         gmanager = Gmanager.instance;
-        transform.rotation = gmanager.transform.rotation;
+
     }
 
     bool CheckCanAddTile(Tile tile)
@@ -71,8 +75,22 @@ public class Chess : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             }
             catch
             {
-
+                StartCoroutine(StartDelay());
             }
+        }
+    }
+    IEnumerator StartDelay()
+    {
+        yield return new WaitForSeconds(1);
+        isStart = true;
+        try
+        {
+            tile.stay = this;
+            transform.position = tile.transform.position;
+        }
+        catch
+        {
+
         }
     }
     private void OnTriggerExit2D(Collider2D other)
@@ -85,7 +103,7 @@ public class Chess : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (gmanager.nowMoveTeam == chessTeam)
+        if (gmanager.nowMoveTeam == chessTeam && pv.IsMine)
         {
             transform.SetAsLastSibling();
             if (tile != null)
@@ -121,7 +139,7 @@ public class Chess : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     }
     public void OnDrag(PointerEventData eventData)
     {
-        if (gmanager.nowMoveTeam == chessTeam)
+        if (gmanager.nowMoveTeam == chessTeam && pv.IsMine)
         {
             transform.position = (Vector3)eventData.position - zuruu;
         }
@@ -130,15 +148,17 @@ public class Chess : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (gmanager.nowMoveTeam == chessTeam)
+        if (gmanager.nowMoveTeam == chessTeam & pv.IsMine)
         {
             if (tile != null)
             {
                 if (tile.CheckChess(this))
                 {
+                    bool eat = false;
                     try
                     {
                         tile.stay.gameObject.SetActive(false);
+                        eat = true;
                     }
                     catch { }
                     if (chessClass == ChessClass.Pawn && tile.canUpgrade)
@@ -150,7 +170,7 @@ public class Chess : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                     home.stay = null;
                     firstMove = false;
                     transform.position = tile.transform.position;
-                    Gmanager.instance.ChangeColor();
+                    Gmanager.instance.ChangeColor(tile.num, chessNum, chessTeam, home.num, eat);
                 }
                 else
                 {
@@ -724,5 +744,11 @@ public class Chess : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         RookGetTile();
         BishopGetTiles();
+    }
+
+
+    public bool CheckIsThis(int _num, Team _team)
+    {
+        return (_num == chessNum && _team == chessTeam);
     }
 }
